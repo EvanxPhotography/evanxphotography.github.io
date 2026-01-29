@@ -21,7 +21,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="style.css" />
-    <title>Meine Fotografie — Evan Winter</title>
+    <title>Meine Fotografie — evanxphotography</title>
   </head>
   <body>
     <nav>
@@ -182,6 +182,24 @@
       </main>
 
       <div class="lightbox" id="lightbox" role="dialog" aria-hidden="true">
+        <button
+          class="lightbox-nav prev"
+          id="lightbox-prev"
+          type="button"
+          aria-label="Vorheriges Foto"
+        >
+          &lsaquo;
+        </button>
+
+        <button
+          class="lightbox-close"
+          id="lightbox-close"
+          type="button"
+          aria-label="Schliessen"
+        >
+          ✕
+        </button>
+
         <div class="lightbox-content">
           <img src="images/DSC02105.jpg" alt="Grossansicht" id="lightbox-img" />
           <div class="caption" id="lightbox-caption">
@@ -190,6 +208,15 @@
             <p class="camera" id="lightbox-camera"></p>
           </div>
         </div>
+
+        <button
+          class="lightbox-nav next"
+          id="lightbox-next"
+          type="button"
+          aria-label="Nächstes Foto"
+        >
+          &rsaquo;
+        </button>
       </div>
 
       <footer>
@@ -221,34 +248,108 @@
         );
       }
 
-      const images = document.querySelectorAll(".gallery img");
+      const images = Array.from(document.querySelectorAll(".gallery img"));
       const lightbox = document.getElementById("lightbox");
       const lightboxImg = document.getElementById("lightbox-img");
       const titleEl = document.getElementById("lightbox-title");
       const descEl = document.getElementById("lightbox-desc");
       const cameraEl = document.getElementById("lightbox-camera");
+      const prevBtn = document.getElementById("lightbox-prev");
+      const nextBtn = document.getElementById("lightbox-next");
+      const closeBtn = document.getElementById("lightbox-close");
+      const lightboxContent = document.querySelector(".lightbox-content");
 
-      images.forEach((img) => {
+      let currentIndex = 0;
+
+      const closeLightbox = () => {
+        if (!lightbox) return;
+        lightbox.classList.remove("active");
+        lightbox.setAttribute("aria-hidden", "true");
+      };
+
+      const showImage = (index) => {
+        if (!images.length || !lightboxImg || !titleEl || !descEl || !cameraEl) {
+          return;
+        }
+        currentIndex = (index + images.length) % images.length;
+        const img = images[currentIndex];
+        lightboxImg.src = img.src;
+        lightboxImg.alt = img.alt || "";
+        titleEl.textContent = img.dataset.title || "";
+        descEl.textContent = img.dataset.desc || "";
+        cameraEl.textContent = img.dataset.camera || "";
+      };
+
+      images.forEach((img, index) => {
         img.addEventListener("click", () => {
-          lightboxImg.src = img.src;
-          lightboxImg.alt = img.alt || "";
-          titleEl.textContent = img.dataset.title || "";
-          descEl.textContent = img.dataset.desc || "";
-          cameraEl.textContent = img.dataset.camera || "";
-          lightbox.classList.add("active");
-          lightbox.setAttribute("aria-hidden", "false");
+          showImage(index);
+          if (lightbox) {
+            lightbox.classList.add("active");
+            lightbox.setAttribute("aria-hidden", "false");
+          }
         });
       });
 
-      lightbox.addEventListener("click", () => {
-        lightbox.classList.remove("active");
-        lightbox.setAttribute("aria-hidden", "true");
+      prevBtn?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        showImage(currentIndex - 1);
+      });
+
+      nextBtn?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        showImage(currentIndex + 1);
+      });
+
+      closeBtn?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        closeLightbox();
+      });
+
+      lightbox?.addEventListener("click", (e) => {
+        if (e.target === lightbox) {
+          closeLightbox();
+        }
+      });
+
+      lightboxContent?.addEventListener("click", (e) => {
+        const target = e.target;
+        if (target instanceof Element && target.closest(".lightbox-nav")) return;
+        closeLightbox();
       });
 
       document.addEventListener("keydown", (e) => {
+        if (!lightbox?.classList.contains("active")) return;
+
         if (e.key === "Escape" || e.key === "Esc") {
-          lightbox.classList.remove("active");
-          lightbox.setAttribute("aria-hidden", "true");
+          closeLightbox();
+        }
+        if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          showImage(currentIndex - 1);
+        }
+        if (e.key === "ArrowRight") {
+          e.preventDefault();
+          showImage(currentIndex + 1);
+        }
+      });
+
+      const clickableSelectors = "a, button, .nav-toggle, .gallery img";
+      const isDesktop = () => window.matchMedia("(min-width: 901px)").matches;
+
+      const spawnFlash = (x, y) => {
+        const flash = document.createElement("span");
+        flash.className = "click-flash";
+        flash.style.left = `${x - 60}px`;
+        flash.style.top = `${y - 60}px`;
+        document.body.appendChild(flash);
+        setTimeout(() => flash.remove(), 320);
+      };
+
+      document.addEventListener("click", (e) => {
+        if (!isDesktop()) return;
+        const target = e.target;
+        if (target instanceof Element && target.closest(clickableSelectors)) {
+          spawnFlash(e.clientX, e.clientY);
         }
       });
     </script>
