@@ -260,7 +260,7 @@
       const lightboxContent = document.querySelector(".lightbox-content");
 
       let currentIndex = 0;
-        let didSwipe = false;
+      let didSwipe = false;
 
       const closeLightbox = () => {
         if (!lightbox) return;
@@ -269,7 +269,13 @@
       };
 
       const showImage = (index) => {
-        if (!images.length || !lightboxImg || !titleEl || !descEl || !cameraEl) {
+        if (
+          !images.length ||
+          !lightboxImg ||
+          !titleEl ||
+          !descEl ||
+          !cameraEl
+        ) {
           return;
         }
         currentIndex = (index + images.length) % images.length;
@@ -313,12 +319,13 @@
       });
 
       lightboxContent?.addEventListener("click", (e) => {
-          if (didSwipe) {
-            didSwipe = false;
-            return;
-          }
+        if (didSwipe) {
+          didSwipe = false;
+          return;
+        }
         const target = e.target;
-        if (target instanceof Element && target.closest(".lightbox-nav")) return;
+        if (target instanceof Element && target.closest(".lightbox-nav"))
+          return;
         closeLightbox();
       });
 
@@ -341,35 +348,38 @@
       const clickableSelectors = "a, button, .nav-toggle, .gallery img";
       const isDesktop = () => window.matchMedia("(min-width: 901px)").matches;
 
+      let touchStartX = 0;
+      let touchStartY = 0;
+      const SWIPE_THRESHOLD = 45;
 
-        let touchStartX = 0;
-        let touchStartY = 0;
-        const SWIPE_THRESHOLD = 45;
+      const touchStart = (e) => {
+        if (!lightbox?.classList.contains("active")) return;
+        const t = e.touches[0];
+        touchStartX = t.clientX;
+        touchStartY = t.clientY;
+      };
 
-        const touchStart = (e) => {
-          if (!lightbox?.classList.contains("active")) return;
-          const t = e.touches[0];
-          touchStartX = t.clientX;
-          touchStartY = t.clientY;
-        };
-
-        const touchEnd = (e) => {
-          if (!lightbox?.classList.contains("active")) return;
-          const t = e.changedTouches[0];
-          const dx = t.clientX - touchStartX;
-          const dy = t.clientY - touchStartY;
-          if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > SWIPE_THRESHOLD) {
-            didSwipe = true;
-            if (dx < 0) {
-              showImage(currentIndex + 1);
-            } else {
-              showImage(currentIndex - 1);
-            }
+      const touchEnd = (e) => {
+        if (!lightbox?.classList.contains("active")) return;
+        const t = e.changedTouches[0];
+        const dx = t.clientX - touchStartX;
+        const dy = t.clientY - touchStartY;
+        if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > SWIPE_THRESHOLD) {
+          didSwipe = true;
+          if (dx < 0) {
+            showImage(currentIndex + 1);
+          } else {
+            showImage(currentIndex - 1);
           }
-        };
+        }
+      };
 
-        lightboxContent?.addEventListener("touchstart", touchStart, { passive: true });
-        lightboxContent?.addEventListener("touchend", touchEnd, { passive: true });
+      lightboxContent?.addEventListener("touchstart", touchStart, {
+        passive: true,
+      });
+      lightboxContent?.addEventListener("touchend", touchEnd, {
+        passive: true,
+      });
       const spawnFlash = (x, y) => {
         const flash = document.createElement("span");
         flash.className = "click-flash";
