@@ -233,6 +233,7 @@
 
     <script>
       const navEl = document.querySelector("nav");
+      const bodyEl = document.body;
       const navToggle = document.querySelector(".nav-toggle");
       const navList = document.getElementById("navMenu");
       if (navEl && navToggle && navList) {
@@ -266,6 +267,7 @@
         if (!lightbox) return;
         lightbox.classList.remove("active");
         lightbox.setAttribute("aria-hidden", "true");
+        bodyEl.classList.remove("no-scroll");
       };
 
       const showImage = (index) => {
@@ -280,7 +282,23 @@
         }
         currentIndex = (index + images.length) % images.length;
         const img = images[currentIndex];
-        lightboxImg.src = img.src;
+
+        // fade out then in when switching images
+        lightboxImg.classList.add("fading");
+        const newSrc = img.src;
+
+        const finishFade = () => {
+          lightboxImg.classList.remove("fading");
+          lightboxImg.onload = null;
+        };
+
+        if (lightboxImg.src === newSrc) {
+          finishFade();
+        } else {
+          lightboxImg.onload = finishFade;
+          lightboxImg.src = newSrc;
+        }
+
         lightboxImg.alt = img.alt || "";
         titleEl.textContent = img.dataset.title || "";
         descEl.textContent = img.dataset.desc || "";
@@ -293,6 +311,7 @@
           if (lightbox) {
             lightbox.classList.add("active");
             lightbox.setAttribute("aria-hidden", "false");
+            bodyEl.classList.add("no-scroll");
           }
         });
       });
