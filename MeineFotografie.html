@@ -15,7 +15,7 @@
       content="Fotografie, Galerie, Evan Winter, Schweiz, Fotograf"
     />
     <meta name="author" content="Evan Winter" />
-    <link rel="icon" type="image/png" href="images/favicon.png" />
+    <link rel="icon" type="image/svg+xml" href="images/favicon.svg" />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap"
       rel="stylesheet"
@@ -260,6 +260,7 @@
       const lightboxContent = document.querySelector(".lightbox-content");
 
       let currentIndex = 0;
+        let didSwipe = false;
 
       const closeLightbox = () => {
         if (!lightbox) return;
@@ -312,6 +313,10 @@
       });
 
       lightboxContent?.addEventListener("click", (e) => {
+          if (didSwipe) {
+            didSwipe = false;
+            return;
+          }
         const target = e.target;
         if (target instanceof Element && target.closest(".lightbox-nav")) return;
         closeLightbox();
@@ -336,6 +341,35 @@
       const clickableSelectors = "a, button, .nav-toggle, .gallery img";
       const isDesktop = () => window.matchMedia("(min-width: 901px)").matches;
 
+
+        let touchStartX = 0;
+        let touchStartY = 0;
+        const SWIPE_THRESHOLD = 45;
+
+        const touchStart = (e) => {
+          if (!lightbox?.classList.contains("active")) return;
+          const t = e.touches[0];
+          touchStartX = t.clientX;
+          touchStartY = t.clientY;
+        };
+
+        const touchEnd = (e) => {
+          if (!lightbox?.classList.contains("active")) return;
+          const t = e.changedTouches[0];
+          const dx = t.clientX - touchStartX;
+          const dy = t.clientY - touchStartY;
+          if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > SWIPE_THRESHOLD) {
+            didSwipe = true;
+            if (dx < 0) {
+              showImage(currentIndex + 1);
+            } else {
+              showImage(currentIndex - 1);
+            }
+          }
+        };
+
+        lightboxContent?.addEventListener("touchstart", touchStart, { passive: true });
+        lightboxContent?.addEventListener("touchend", touchEnd, { passive: true });
       const spawnFlash = (x, y) => {
         const flash = document.createElement("span");
         flash.className = "click-flash";
