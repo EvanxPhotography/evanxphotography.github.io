@@ -104,13 +104,13 @@ body {
 }
 @media (max-width: 700px) {
   .hero-title {
-    font-size: 2.1rem;
+    font-size: 1.9rem;
   }
   .hero-content {
-    padding: 28px 8px;
+    padding: 20px 12px;
   }
   .hero-bg {
-    min-height: 70vh;
+    min-height: 62vh;
   }
 }
 
@@ -215,17 +215,44 @@ body {
 }
 @media (max-width: 600px) {
   .featured {
-    padding: 32px 12px 18px 12px;
+    padding: 22px 12px 12px 12px;
   }
   .featured-strip {
-    grid-auto-columns: minmax(200px, 240px);
-    gap: 12px;
+    grid-auto-columns: minmax(190px, 230px);
+    gap: 10px;
   }
   .featured-card img {
-    height: 200px;
+    height: 180px;
   }
   .featured-ctrl {
     width: 100%;
     justify-content: flex-end;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-content {
+    padding: 16px 12px;
+  }
+  .hero-title {
+    font-size: 1.7rem;
+  }
+  .hero-sub {
+    font-size: 1.05rem;
+    margin-bottom: 20px;
+  }
+  .featured {
+    padding: 18px 10px 10px 10px;
+  }
+  .featured-head {
+    margin-bottom: 12px;
+  }
+  .featured-strip {
+    grid-auto-columns: minmax(170px, 210px);
+    gap: 8px;
+    padding: 4px 2px 8px 2px;
+  }
+  .featured-card img {
+    height: 160px;
   }
 }

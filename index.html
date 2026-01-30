@@ -209,6 +209,13 @@
       }
 
       function setupCollage() {
+        if (!collageBg) return;
+        const isPhone = window.matchMedia("(max-width: 700px)").matches;
+        if (isPhone) {
+          collageBg.innerHTML = "";
+          collageImgs.length = 0;
+          return;
+        }
         collageBg.innerHTML = "";
         collageImgs.length = 0;
         for (let i = 0; i < NUM_IMAGES; i++) {
@@ -220,8 +227,17 @@
       }
 
       window.addEventListener("resize", () => {
+        const isPhone = window.matchMedia("(max-width: 700px)").matches;
+        if (isPhone) {
+          collageBg?.replaceChildren();
+          collageImgs.length = 0;
+          return;
+        }
         for (const img of collageImgs) {
           img.style.top = randomY() + "px";
+        }
+        if (!collageImgs.length) {
+          setupCollage();
         }
       });
 

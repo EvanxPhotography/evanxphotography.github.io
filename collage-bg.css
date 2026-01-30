@@ -19,12 +19,7 @@
 
 @media (max-width: 700px) {
   .collage-bg {
-    position: absolute;
-    inset: 0;
-    width: 100vw;
-    height: 100vh;
-    pointer-events: none;
-    z-index: 0;
+    display: none;
   }
   .collage-img {
     width: 48px;
